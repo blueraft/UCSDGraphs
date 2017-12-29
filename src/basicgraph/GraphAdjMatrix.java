@@ -1,10 +1,9 @@
 package basicgraph;
 
+import util.GraphLoader;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /** A class that implements a directed graph. 
  * The graph may have self-loops, parallel edges. 
@@ -105,7 +104,15 @@ public class GraphAdjMatrix extends Graph {
 	 */	
 	public List<Integer> getDistance2(int v) {
 		// XXX Implement this method in week 2
-		return null;
+        List<Integer> distance2 = new ArrayList<>();
+        List<Integer> distance1 = getNeighbors(v);
+        for (int i = 0; i < distance1.size(); i++){
+            int [] array = adjMatrix[distance1.get(i)];
+            for (int j = 0; j < array.length; j++){
+                if (array[j] == 1) distance2.add(j);
+            }
+        }
+		return distance2;
 	}
 	
 	/**
@@ -125,4 +132,25 @@ public class GraphAdjMatrix extends Graph {
 		return s;
 	}
 
+    public static void main (String[] args) {
+        GraphLoader.createIntersectionsFile("data/maps/ucsd.map", "data/intersections/ucsd.intersections");
+
+
+        // For testing of Part 1 functionality
+        // Add your tests here to make sure your degreeSequence method is returning
+        // the correct list, after examining the graphs.
+        System.out.println("Loading graphs based on real data...");
+        System.out.println("Goal: use degree sequence to analyse graphs.");
+
+        System.out.println("****");
+        System.out.println("Roads / intersections:");
+        GraphAdjMatrix graphFromFile = new GraphAdjMatrix();
+        GraphLoader.loadRoadMap("data/testdata/simpletest.map", graphFromFile);
+        System.out.println(graphFromFile);
+
+        System.out.println("Observe all degrees are <= 12.");
+        System.out.println("****");
+        System.out.println(graphFromFile.getDistance2(3));
+        System.out.println("\n****");
+    }
 }
