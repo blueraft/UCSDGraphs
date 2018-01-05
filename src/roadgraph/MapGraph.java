@@ -176,6 +176,7 @@ public class MapGraph {
             }
 	        current = parents.get(current);
         }
+        path.add(current.getLocation());
         Collections.reverse(path);
 	    return path;
     }
