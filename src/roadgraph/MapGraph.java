@@ -50,9 +50,7 @@ public class MapGraph {
 	public Set<GeographicPoint> getVertices()
 	{
 	    HashSet<GeographicPoint> geoVertices = new HashSet();
-	    for (GeographicPoint vertex: vertices.keySet()){
-	        geoVertices.add(vertex);
-        }
+        geoVertices.addAll(vertices.keySet());
 		return geoVertices;
 	}
 	
@@ -150,14 +148,17 @@ public class MapGraph {
 		        return pathMapper(parent,current,start);
             }
 		    for (Node neighbhor: current.getEdges()){
-                visited.add(neighbhor);
-                parent.put(neighbhor,current);
-                queue.addLast(neighbhor);
+		        if(!visited.contains(neighbhor)) {
+                    visited.add(neighbhor);
+                    parent.put(neighbhor, current);
+                    queue.addLast(neighbhor);
+                }
             }
+            nodeSearched.accept(current.getLocation());
 
         }
 		// Hook for visualization.  See writeup.
-		//nodeSearched.accept(next.getLocation());
+
 
 		return null;
 	}
@@ -260,10 +261,8 @@ public class MapGraph {
         }
 
         private List<Node> getEdges(){
-            List edgelist = new ArrayList();
-	        for (Node edge: edges.keySet()){
-	            edgelist.add(edge);
-            }
+            List<Node> edgelist = new ArrayList();
+            edgelist.addAll(edges.keySet());
             return edgelist;
         }
 
