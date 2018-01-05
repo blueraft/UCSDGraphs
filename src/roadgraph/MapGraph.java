@@ -8,12 +8,11 @@
 package roadgraph;
 
 
-import java.util.List;
-import java.util.Set;
-import java.util.function.Consumer;
-
 import geography.GeographicPoint;
 import util.GraphLoader;
+
+import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * @author UCSD MOOC development team and YOU
@@ -24,14 +23,13 @@ import util.GraphLoader;
  */
 public class MapGraph {
 	//TODO: Add your member variables here in WEEK 3
-	
-	
+	private HashSet<Node> vertices;
 	/** 
 	 * Create a new empty MapGraph 
 	 */
 	public MapGraph()
 	{
-		// TODO: Implement in this constructor in WEEK 3
+		vertices = new HashSet<>();
 	}
 	
 	/**
@@ -40,8 +38,7 @@ public class MapGraph {
 	 */
 	public int getNumVertices()
 	{
-		//TODO: Implement this method in WEEK 3
-		return 0;
+		return vertices.size();
 	}
 	
 	/**
@@ -50,8 +47,11 @@ public class MapGraph {
 	 */
 	public Set<GeographicPoint> getVertices()
 	{
-		//TODO: Implement this method in WEEK 3
-		return null;
+	    HashSet<GeographicPoint> geoVertices = new HashSet();
+	    for (Node vertex: vertices){
+	        geoVertices.add(vertex.getLocation());
+        }
+		return geoVertices;
 	}
 	
 	/**
@@ -197,7 +197,49 @@ public class MapGraph {
 		return null;
 	}
 
-	
+    private class Node {
+        private GeographicPoint location;
+        private HashMap<GeographicPoint,ArrayList> edges;
+
+	    Node(GeographicPoint location){
+	        this.location = location;
+	        edges = new HashMap<>();
+        }
+
+        private GeographicPoint getLocation() {
+	        return location;
+        }
+
+        private boolean addEdge(GeographicPoint end,String roadName,
+                        String roadType, double length){
+	        if (!edges.containsKey(end)) {
+	            ArrayList list = new ArrayList();
+	            list.add(roadName);
+	            list.add(roadType);
+	            list.add(length);
+	            edges.put(end,list);
+            }
+	        return false;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Node)) return false;
+
+            Node node = (Node) o;
+
+            if (location != null ? !location.equals(node.location) : node.location != null) return false;
+            return edges != null ? edges.equals(node.edges) : node.edges == null;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = location != null ? location.hashCode() : 0;
+            result = 31 * result + (edges != null ? edges.hashCode() : 0);
+            return result;
+        }
+    }
 	
 	public static void main(String[] args)
 	{
@@ -262,5 +304,8 @@ public class MapGraph {
 		*/
 		
 	}
-	
+
+
+
 }
+
