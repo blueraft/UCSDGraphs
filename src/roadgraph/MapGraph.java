@@ -260,7 +260,7 @@ public class MapGraph {
         HashMap<Node,Node> parent = new HashMap();
         Node startNode = vertices.get(start);
         Node goalNode = vertices.get(goal);
-        Comparator<Node> distanceCompare = Comparator.comparingDouble(node -> node.getPriorityDistance());
+        Comparator<Node> distanceCompare = Comparator.comparingDouble(node -> node.aStarDistance());
         PriorityQueue<Node> queue = new PriorityQueue<>(distanceCompare);
         Node current;
         startNode.setPriorityDistance(0);
@@ -274,9 +274,10 @@ public class MapGraph {
                 if (current.equals(goalNode)) return pathMapper(parent,current,startNode);
                 for (Node neighbor: current.getEdges()){
                     double distance = current.getPriorityDistance() + current.getDistance(neighbor);
-                    if (!visited.contains(neighbor) && neighbor.getPriorityDistance() > distance
-                            && (neighbor.getLocation().distance(goal) < current.getLocation().distance(goal))){
+                    double heuristicDistance = neighbor.getLocation().distance(goal);
+                    if (!visited.contains(neighbor) && neighbor.getPriorityDistance() > distance){
                         neighbor.setPriorityDistance(distance);
+                        neighbor.setHeuristicDistance(heuristicDistance);
                         parent.put(neighbor, current);
                         queue.add(neighbor);
                     }
@@ -291,6 +292,7 @@ public class MapGraph {
         private GeographicPoint location;
         private HashMap<Node,ArrayList> edges;
         private double priorityDistance;
+        private double heuristicDistance;
 
 	    Node(GeographicPoint location){
 	        this.location = location;
@@ -321,6 +323,20 @@ public class MapGraph {
         private double getPriorityDistance(){
             return priorityDistance;
         }
+
+        private void setHeuristicDistance(double hDistance){
+            heuristicDistance = hDistance;
+        }
+
+        private double getHeuristicDistance(){
+            return heuristicDistance;
+        }
+
+        private double aStarDistance(){
+            return heuristicDistance+priorityDistance;
+        }
+
+
         private boolean addEdge(Node end,String roadName,
                         String roadType, double length){
 	        if (!edges.containsKey(end)) {
