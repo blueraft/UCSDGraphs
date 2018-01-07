@@ -145,7 +145,7 @@ public class MapGraph {
 		while (!queue.isEmpty()) {
 		    Node current = queue.removeFirst();
 		    if (current.equals(goalNode)) {
-		        return pathMapper(parent,current,start);
+		        return pathMapper(parent,current,startNode);
             }
 		    for (Node neighbhor: current.getEdges()){
 		        if(!visited.contains(neighbhor)) {
@@ -164,22 +164,17 @@ public class MapGraph {
 	}
 
 	private List<GeographicPoint> pathMapper(HashMap<Node,Node> parents,
-                                             Node current, GeographicPoint start) {
-	    List<GeographicPoint> path = new ArrayList<>();
-	    while (!(parents.get(current) == null)){
-	        path.add(current.getLocation());
-	        if (start.equals(current.getLocation()) || parents.get(current) == null) {
-	            if (!(path.contains(current.getLocation()))) {
-	                path.add(current.getLocation());
-                }
-                Collections.reverse(path);
-	            return path;
-            }
-	        current = parents.get(current);
+                                             Node current, Node start) {
+        LinkedList<GeographicPoint> path = new LinkedList<GeographicPoint>();
+
+        while (!current.equals(start)) {
+            path.addFirst(current.getLocation());
+            current = parents.get(current);
         }
-        path.add(current.getLocation());
-        Collections.reverse(path);
-	    return path;
+
+        // add start
+        path.addFirst(start.getLocation());
+        return path;
     }
 
 	/** Find the path from start to goal using Dijkstra's algorithm
