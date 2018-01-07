@@ -255,13 +255,37 @@ public class MapGraph {
 	public List<GeographicPoint> aStarSearch(GeographicPoint start, 
 											 GeographicPoint goal, Consumer<GeographicPoint> nodeSearched)
 	{
-		// TODO: Implement this method in WEEK 4
-		
-		// Hook for visualization.  See writeup.
-		//nodeSearched.accept(next.getLocation());
-		
-		return null;
+        if (!(vertices.containsKey(start) && vertices.containsKey(goal))) return null;
+        HashSet<Node> visited = new HashSet();
+        HashMap<Node,Node> parent = new HashMap();
+        Node startNode = vertices.get(start);
+        Node goalNode = vertices.get(goal);
+        Comparator<Node> distanceCompare = Comparator.comparingDouble(node -> node.getPriorityDistance());
+        PriorityQueue<Node> queue = new PriorityQueue<>(distanceCompare);
+        Node current;
+        startNode.setPriorityDistance(0);
+        queue.add(startNode);
+        parent.put(startNode,null);
+        while (queue.size() != 0)
+        {
+            current = queue.remove();
+            if (!visited.contains(current)){
+                visited.add(current);
+                if (current.equals(goalNode)) return pathMapper(parent,current,startNode);
+                for (Node neighbor: current.getEdges()){
+                    double distance = current.getPriorityDistance() + current.getDistance(neighbor);
+                    if (!visited.contains(neighbor) && neighbor.getPriorityDistance() > distance
+                            && (neighbor.getLocation().distance(goal) < current.getLocation().distance(goal))){
+                        neighbor.setPriorityDistance(distance);
+                        parent.put(neighbor, current);
+                        queue.add(neighbor);
+                    }
+                }
+            }
+        }
+        return null;
 	}
+
 
     private class Node {
         private GeographicPoint location;
