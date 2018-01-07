@@ -206,14 +206,27 @@ public class MapGraph {
         HashMap<Node,Node> parent = new HashMap();
         Node startNode = vertices.get(start);
         Node goalNode = vertices.get(goal);
-        Comparator<Node> distanceCompare = Comparator.comparingDouble(node -> node.getDistance(goalNode));
+        Comparator<Node> distanceCompare = Comparator.comparingDouble(node -> node.getPriorityDistance());
         PriorityQueue<Node> queue = new PriorityQueue<>(distanceCompare);
-
+        Node current;
+        startNode.setPriorityDistance(0);
         queue.add(startNode);
-        queue.add(goalNode);
+        parent.put(startNode,null);
         while (queue.size() != 0)
         {
-            System.out.println(queue.remove().getLocation());
+            current = queue.remove();
+            if (!visited.contains(current)){
+                visited.add(current);
+                if (current.equals(goalNode)) return pathMapper(parent,current,startNode);
+                for (Node neighbor: current.getEdges()){
+                    double distance = current.getPriorityDistance() + neighbor.getDistance(current);
+                    if (!visited.contains(neighbor) && neighbor.getPriorityDistance() > distance){
+                        neighbor.setPriorityDistance(distance);
+                        parent.put(neighbor, current);
+                        queue.add(neighbor);
+                    }
+                }
+            }
         }
 		return null;
 	}
@@ -253,10 +266,13 @@ public class MapGraph {
     private class Node {
         private GeographicPoint location;
         private HashMap<Node,ArrayList> edges;
+        private double priorityDistance;
 
 	    Node(GeographicPoint location){
 	        this.location = location;
 	        edges = new HashMap<>();
+	        priorityDistance = Double.POSITIVE_INFINITY;
+
         }
 
         private GeographicPoint getLocation() {
@@ -274,6 +290,13 @@ public class MapGraph {
             return (double) edges.get(edge).get(2);
         }
 
+        private void setPriorityDistance(double pDistance){
+            priorityDistance = pDistance;
+        }
+
+        private double getPriorityDistance(){
+            return priorityDistance;
+        }
         private boolean addEdge(Node end,String roadName,
                         String roadType, double length){
 	        if (!edges.containsKey(end)) {
