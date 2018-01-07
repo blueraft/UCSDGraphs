@@ -166,7 +166,6 @@ public class MapGraph {
 	private List<GeographicPoint> pathMapper(HashMap<Node,Node> parents,
                                              Node current, Node start) {
         LinkedList<GeographicPoint> path = new LinkedList<GeographicPoint>();
-
         while (!current.equals(start)) {
             path.addFirst(current.getLocation());
             current = parents.get(current);
@@ -202,11 +201,20 @@ public class MapGraph {
 	public List<GeographicPoint> dijkstra(GeographicPoint start, 
 										  GeographicPoint goal, Consumer<GeographicPoint> nodeSearched)
 	{
-		// TODO: Implement this method in WEEK 4
+        if (!(vertices.containsKey(start) && vertices.containsKey(goal))) return null;
+        HashSet<Node> visited = new HashSet();
+        HashMap<Node,Node> parent = new HashMap();
+        Node startNode = vertices.get(start);
+        Node goalNode = vertices.get(goal);
+        Comparator<Node> distanceCompare = Comparator.comparingDouble(node -> node.getDistance(goalNode));
+        PriorityQueue<Node> queue = new PriorityQueue<>(distanceCompare);
 
-		// Hook for visualization.  See writeup.
-		//nodeSearched.accept(next.getLocation());
-		
+        queue.add(startNode);
+        queue.add(goalNode);
+        while (queue.size() != 0)
+        {
+            System.out.println(queue.remove().getLocation());
+        }
 		return null;
 	}
 
@@ -261,6 +269,10 @@ public class MapGraph {
             return edgelist;
         }
 
+        private double getDistance(Node edge){
+            if (!edges.containsKey(edge)) return 0;
+            return (double) edges.get(edge).get(2);
+        }
 
         private boolean addEdge(Node end,String roadName,
                         String roadType, double length){
@@ -288,7 +300,7 @@ public class MapGraph {
         simpleTestMap.addEdge(testStart,testEnd,"test","fsf",12.3);
         GraphLoader.loadRoadMap("data/testdata/simpletest.map", simpleTestMap);
         System.out.println("Test 1 using simpletest: Dijkstra should be 9 and AStar should be 5");
-        List<GeographicPoint> testroute = simpleTestMap.bfs(testStart,testEnd);
+        List<GeographicPoint> testroute = simpleTestMap.dijkstra(testStart,testEnd);
         System.out.println(testroute);
 
 
@@ -353,6 +365,9 @@ public class MapGraph {
 		
 	}
 
+	    /* with help from stackoverflow link below
+		 * https://stackoverflow.com/questions/683041/how-do-i-use-a-priorityqueue
+		 */
 
 
 }
