@@ -219,7 +219,7 @@ public class MapGraph {
                 visited.add(current);
                 if (current.equals(goalNode)) return pathMapper(parent,current,startNode);
                 for (Node neighbor: current.getEdges()){
-                    double distance = current.getPriorityDistance() + neighbor.getDistance(current);
+                    double distance = current.getPriorityDistance() + current.getDistance(neighbor);
                     if (!visited.contains(neighbor) && neighbor.getPriorityDistance() > distance){
                         neighbor.setPriorityDistance(distance);
                         parent.put(neighbor, current);
